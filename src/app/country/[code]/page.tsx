@@ -7,7 +7,7 @@ import { Country } from "../../../types/country";
 // Fetch single country by code
 async function getCountryByCode(code: string): Promise<Country | null> {
   try {
-    const res = await fetch(`https://restcountries.com/v3.1/alpha/${code}`, {
+    const res = await fetch(`https://restcountries.com/v3.1/all/${code}`, {
       next: { revalidate: 3600 }
     });
     

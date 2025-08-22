@@ -1,11 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Country } from "@/types/country";
+import SearchAndFilter from "./components/searchAndFilter";
 
-async function getCountries() {
-  const res = await fetch("https://restcountries.com/v3.1/all");
+async function getCountries(): Promise<Country[]> {
+  try {
+  const res = await fetch("https://restcountries.com/v3.1/all", {
+    next: {revalidate: 3600}
+  });
   if (!res.ok) throw new Error("Failed to fetch countries");
-  return res.json();
+
+  const data = await res.json();
+  return data;
+  } catch (error) {
+    console.error("Error fetching countries", error);
+    return[];
+  }
 }
 
 function filterCountries(
@@ -19,7 +29,7 @@ function filterCountries(
 
     const matchesRegion = region === "" || country.region === region;
 
-    return matchesRegion && matchesRegion;
+    return matchesSearch && matchesRegion;
   });
 }
 
@@ -46,6 +56,12 @@ export default async function Home({searchParams}: HomeProps) {
     <div className="space-y-6">
       <div className="text-center space-y-2">
         <h1 className="text-4xl font-bold text gray-800">Countries of the world</h1>
+      </div>
+
+      <SearchAndFilter/>
+
+      <div className="flex justify-between item-center">
+        <p className="text-gray-600">Showing {sortedCountries.length} of {countries.length} countries</p>
       </div>
 
       {/* Countries Grid */}
